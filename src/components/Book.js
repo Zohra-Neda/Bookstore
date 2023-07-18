@@ -1,22 +1,35 @@
-import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
-function Book() {
-  const [bookState, setBookState] = useState('');
-
-  const handleDelete = () => {
-    // Logic to delete the book
-    setBookState('Book deleted');
-  };
-
+function Book({ book, deleteBook }) {
   return (
     <div>
-      <p>
-        Individual Book State:
-        {bookState}
-      </p>
-      <button type="button" onClick={handleDelete}>Remove</button>
+      <li>
+        <div>
+          <span>Title:</span>
+          {book.title}
+        </div>
+        <div>
+          <span>Author:</span>
+          {book.author}
+        </div>
+        <div>
+          <span>Category:</span>
+          {book.category}
+        </div>
+        <button type="button" onClick={() => deleteBook(book.id)}>Delete Book</button>
+      </li>
     </div>
   );
 }
+
+Book.propTypes = {
+  book: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    author: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+  }).isRequired,
+  deleteBook: PropTypes.func.isRequired,
+};
 
 export default Book;
