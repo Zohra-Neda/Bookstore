@@ -4,34 +4,46 @@ import { v4 as uuidv4 } from 'uuid';
 import { addBook } from '../redux/books/booksSlice';
 
 function Form() {
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [category, setCategory] = useState('');
-  const [bookData, setBookData] = useState([]);
-
   const dispatch = useDispatch();
+  const [bookData, setBookData] = useState({
+    title: '',
+    author: '',
+    category: '',
+  });
+
+  const { title, author, category } = bookData;
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setBookData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newBook = {
-      id: uuidv4(),
-      title,
-      author,
-      category,
-    };
-    dispatch(addBook(newBook));
-    setBookData([...bookData, newBook]);
-    setTitle('');
-    setAuthor('');
-    setCategory('');
+    if (title !== '' && author !== '' && category !== '') {
+      const newBook = {
+        item_id: uuidv4(),
+        ...bookData,
+      };
+
+      dispatch(addBook(newBook));
+      setBookData({
+        title: '',
+        author: '',
+        category: '',
+      });
+    }
   };
   return (
     <div className="form-container">
       <h2>ADD NEW BOOK</h2>
       <form>
-        <input type="text" placeholder="Book title" id="title" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <input type="text" placeholder="Book author" id="author" value={author} onChange={(e) => setAuthor(e.target.value)} />
-        <select name="category" value={category} onChange={(e) => setCategory(e.target.value)}>
+        <input type="text" name="title" placeholder="Book title" id="title" value={title} onChange={handleInputChange} />
+        <input type="text" name="author" placeholder="Book author" id="author" value={author} onChange={handleInputChange} />
+        <select name="category" value={category} onChange={handleInputChange}>
           <option value="">Select Category</option>
           <option value="memoir">Memoir</option>
           <option value="science">Science</option>

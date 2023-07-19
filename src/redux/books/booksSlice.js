@@ -1,12 +1,14 @@
+/* eslint-disable no-param-reassign */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const baseURL = 'https://us-central1-bookstore-api-e63c8.cloudfunctions.net/bookstoreApi/apps/3vFyhCKT7BHkc1CWchtM/books';
+
 export const fetchBooks = createAsyncThunk(
   'books/fetchBooks',
   async (_, thunkAPI) => {
     try {
-      const response = await axios.get(baseURL);
+      const response = await axios(baseURL);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue('Request failed');
@@ -16,10 +18,15 @@ export const fetchBooks = createAsyncThunk(
 
 export const addBook = createAsyncThunk(
   'addBooks/addBook',
-  async (bookData, thunkAPI) => {
+  async (book, thunkAPI) => {
     try {
-      const response = await axios.post(baseURL, bookData);
-      return response.data;
+      const response = await axios.post(baseURL, book);
+
+      if (response.status === 201) {
+        thunkAPI.dispatch(fetchBooks());
+        return null;
+      }
+      return null;
     } catch (error) {
       return thunkAPI.rejectWithValue('Post request failed');
     }
@@ -31,13 +38,19 @@ export const removeBook = createAsyncThunk(
   async (itemId, thunkAPI) => {
     try {
       const response = await axios.delete(`${baseURL}/${itemId}`);
-      return response.data;
+
+      if (response.status === 201) {
+        thunkAPI.dispatch(fetchBooks());
+        return null;
+      }
+      return null;
     } catch (error) {
       return thunkAPI.rejectWithValue('Could not delete book');
     }
   },
 );
-const booksSlice = createSlice({
+
+const bookSlice = createSlice({
   name: 'books',
   initialState: {
     books: [],
@@ -47,47 +60,38 @@ const booksSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchBooks.pending, (state) => ({
-        ...state,
-        isLoading: true,
-      }))
-      .addCase(fetchBooks.fulfilled, (state, action) => ({
-        ...state,
-        isLoading: false,
-        books: action.payload,
-      }))
-      .addCase(fetchBooks.rejected, (state, action) => ({
-        ...state,
-        isLoading: false,
-        error: action.payload,
-      }))
-      .addCase(addBook.pending, (state) => ({
-        ...state,
-        isLoading: true,
-      }))
-      .addCase(addBook.fulfilled, (state) => ({
-        ...state,
-        isLoading: false,
-      }))
-      .addCase(addBook.rejected, (state, action) => ({
-        ...state,
-        isLoading: false,
-        error: action.payload,
-      }))
-      .addCase(removeBook.pending, (state) => ({
-        ...state,
-        isLoading: true,
-      }))
-      .addCase(removeBook.fulfilled, (state) => ({
-        ...state,
-        isLoading: false,
-      }))
-      .addCase(removeBook.rejected, (state, action) => ({
-        ...state,
-        isLoading: false,
-        error: action.payload,
-      }));
+      .addCase(fetchBooks.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchBooks.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.books = action.payload;
+      })
+      .addCase(fetchBooks.rejected, (state) => {
+        state.isLoading = false;
+        state.error = true;
+      })
+      .addCase(addBook.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(addBook.fulfilled, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(addBook.rejected, (state) => {
+        state.isLoading = false;
+        state.error = true;
+      })
+      .addCase(removeBook.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(removeBook.fulfilled, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(removeBook.rejected, (state) => {
+        state.isLoading = false;
+        state.error = true;
+      });
   },
 });
 
-export default booksSlice.reducer;
+export default bookSlice.reducer;

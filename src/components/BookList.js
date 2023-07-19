@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchBooks, removeBook } from '../redux/books/booksSlice';
-import Book from './Book';
-import Form from './Form';
 
 function BookList() {
   const { books, isLoading, error } = useSelector((state) => state.books);
@@ -11,10 +9,6 @@ function BookList() {
   useEffect(() => {
     dispatch(fetchBooks());
   }, [dispatch]);
-
-  const handleDelete = (id) => {
-    dispatch(removeBook(id));
-  };
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -28,12 +22,46 @@ function BookList() {
     return null;
   }
 
+  const renderBook = (itemId, book) => {
+    const {
+      category, title, author, chapter,
+    } = book[0];
+
+    return (
+      <div key={itemId}>
+        <div>
+          <p>{category}</p>
+          <h3>{title}</h3>
+          <p>{author}</p>
+          <div>
+            <button type="button">Comment</button>
+            <div>
+              <button
+                type="button"
+                onClick={() => dispatch(removeBook(itemId))}
+              >
+                Remove
+              </button>
+            </div>
+            <button type="button">Edit</button>
+          </div>
+        </div>
+        <div>
+          <h4>75%</h4>
+          <div>Completed</div>
+        </div>
+        <div>
+          <h3>Current Chapter</h3>
+          <p>{chapter}</p>
+          <button type="button">Update Progress</button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
-      {Object.values(books).map((book) => (
-        <Book key={book.id} book={book} deleteBook={handleDelete} />
-      ))}
-      <Form />
+      {Object.entries(books).map(([itemId, book]) => renderBook(itemId, book))}
     </div>
   );
 }
