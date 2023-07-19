@@ -5,10 +5,16 @@ function Navbar() {
   return (
     <div>
       <header>
-        <h1>Bookstore</h1>
+        <h1>Bookstore CMS</h1>
         <nav>
-          <Link to="/">BOOKS</Link>
-          <Link to="categories">CATEGORIES</Link>
+          <ul>
+            <li>
+              <Link to="/">BOOKS</Link>
+            </li>
+            <li>
+              <Link to="/categories">CATEGORIES</Link>
+            </li>
+          </ul>
         </nav>
       </header>
     </div>
