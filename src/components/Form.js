@@ -13,8 +13,7 @@ function Form() {
 
   const { title, author, category } = bookData;
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleInputChange = ({ target: { name, value } }) => {
     setBookData((prevData) => ({
       ...prevData,
       [name]: value,

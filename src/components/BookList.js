@@ -22,10 +22,13 @@ function BookList() {
     return null;
   }
 
-  const renderBook = (itemId, book) => {
+  const renderBook = (itemId, [book]) => {
     const {
-      category, title, author, chapter,
-    } = book[0];
+      category,
+      title,
+      author,
+      chapter,
+    } = book;
 
     return (
       <div key={itemId}>
